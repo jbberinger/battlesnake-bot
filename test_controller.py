@@ -1,4 +1,4 @@
-from controller import Direction, get_snake_direction, get_possible_moves, get_position_vector
+from controller import Direction, get_snake_direction, get_possible_moves, position_vector, get_food_positions
 import numpy as np
 
 
@@ -7,7 +7,7 @@ def test_get_position_vector():
         'x': 2,
         'y': 7
     }
-    position = get_position_vector(position_dict)
+    position = position_vector(position_dict)
     expected_position = np.array([2, 7])
     assert np.array_equal(position, expected_position)
 
@@ -101,3 +101,27 @@ def test_get_possible_moves_alone():
     expected_possible_moves = [Direction.DOWN, Direction.LEFT, Direction.RIGHT]
 
     assert np.array_equal(expected_possible_moves, possible_moves)
+
+
+def test_get_food_positions():
+
+    food = [
+        {
+            "x": 3,
+            "y": 1
+        },
+        {
+            "x": 6,
+            "y": 3
+        },
+        {
+            "x": 9,
+            "y": 5
+        }
+    ]
+
+    food_positions = get_food_positions(food)
+    print(food_positions)
+    expected_food_positions = np.array([[3, 1], [6, 3], [9, 5]])
+    print(expected_food_positions)
+    assert np.array_equal(expected_food_positions, food_positions)
