@@ -1,5 +1,4 @@
 import numpy as np
-import sys
 '''
 https://en.wikipedia.org/wiki/A*_search_algorithm
 http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
@@ -40,6 +39,7 @@ def reconstruct_path(solution):
 def heuristic_cost(position1, position2):
     return abs(position1[0] - position2[0]) + abs(position1[1] - position2[1])
 
+
 def a_star(graph, start_position, goal_position):
     occupied_spaces = graph['occupied_spaces']
     width = graph['width']
@@ -50,20 +50,23 @@ def a_star(graph, start_position, goal_position):
 
     # nodes that have not been fully evaluated
     open_list = [start_node]
+
     # nodes that have been fully evluated
     closed_list = []
 
+    # stop condition
+    outer_iterations = 0
+    # max_iterations = width ** 4
+
+    # all four adjacent moves (up, down, left, right)
+    adjacent_moves = [(0, -1), (0, 1), (-1, 0), (1, 0)]
+
     while open_list:
+
+        outer_iterations += 1
 
         current_node = open_list[0]
         current_index = 0
-
-        # displays count
-        # i = len(open_list)
-        # j = open_list
-        # sys.stdout.write("\rLoops %i and open list" % i % j)
-        # sys.stdout.flush()
-        print(len(open_list))
 
         # finds open node with lowest f score
         for index, open_node in enumerate(open_list):
@@ -71,16 +74,22 @@ def a_star(graph, start_position, goal_position):
                 current_node = open_node
                 current_index = index
 
+        # end pathfinding and return unfinished path
+        # if outer_iterations > max_iterations:
+        #     print('pathfinding ended, too many iterations')
+        #     return reconstruct_path(current_node)
+
         open_list.pop(current_index)
         closed_list.append(current_node)
 
         # return path if solution found
         if current_node == end_node:
+            print(outer_iterations)
             return reconstruct_path(current_node)
 
         children = []
-        # generates valid child nodes
-        for move in [(0, -1), (0, 1), (-1, 0), (1, 0)]:
+        # generate child nodes
+        for move in adjacent_moves:
             new_position = np.add(current_node.position, move)
 
             # check border boundaries
@@ -100,32 +109,39 @@ def a_star(graph, start_position, goal_position):
             children.append(new_node)
 
         for child_node in children:
-            skip = False
+            is_closed = False
             for closed_node in closed_list:
                 if child_node == closed_node:
-                    skip = True
+                    is_closed = True
                     continue
-            if skip:
+            if is_closed:
                 continue
 
             child_node.g = current_node.g + 1
             child_node.h = heuristic_cost(child_node.position, end_node.position)
             child_node.f = child_node.g + child_node.h
 
+            in_open_list = False
             for open_node in open_list:
-                if child_node == open_node and child_node.g > open_node.g:
-                    continue
+                # >= makes straighter lines, > makes squggly lines
+                if child_node == open_node and child_node.g >= open_node.g:
+                    # already exists in open list
+                    in_open_list = True
+                    break
+            
+            if in_open_list:
+                continue
 
             open_list.append(child_node) 
 
 if __name__ == "__main__":
     graph = {
-        'occupied_spaces': [[1,0],[1,1],[1,2],[1,3]],
-        'width': 3,
-        'height': 5
+        'occupied_spaces': [],
+        'width': 7,
+        'height': 7
     }
     start_position = [0,0]
-    goal_position = [2,0]
+    goal_position = [6,6]
 
     path = a_star(graph, start_position, goal_position)
-    print('\n', path)
+    print('\n', 'path: ', path)
