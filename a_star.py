@@ -2,11 +2,12 @@ import numpy as np
 '''
 https://en.wikipedia.org/wiki/A*_search_algorithm
 http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
-A* finds the shortest path from start to goal. It is an extension of Dijkstra's algorithm.
 
-A* finds the patch that minimizes f(n) = g(n) + h(n)
+A* finds the shortest path from start to goal. It is an extension of Dijkstra's algorithm
+minimizes f(n) = g(n) + h(n)
 n: next node on the path
-g(n): cost of the path from the start node to n
+f(n) A* cost
+g(n): cost of path from the start node to n
 h(n): heuristic function that estimates cost from n to goal
 
 A* terminates when the path it extends is from start to goal (ie. solution found)
@@ -27,18 +28,17 @@ class Node:
     def __eq__(self, other):
         return np.array_equal(self.position, other.position)
 
-
+# steps through linked nodes and returns path in the correct order
 def reconstruct_path(solution):
     path = []
     while solution is not None:
         path.append(solution.position)
         solution = solution.parent_node
-    return path[::-1]
+    return path[len(path)-2::-1]
 
 # Manhattan distance
 def heuristic_cost(position1, position2):
     return abs(position1[0] - position2[0]) + abs(position1[1] - position2[1])
-
 
 def a_star(graph, start_position, goal_position):
     occupied_spaces = graph['occupied_spaces']
@@ -50,21 +50,12 @@ def a_star(graph, start_position, goal_position):
 
     # nodes that have not been fully evaluated
     open_list = [start_node]
-
     # nodes that have been fully evluated
     closed_list = []
-
-    # stop condition
-    outer_iterations = 0
-    # max_iterations = width ** 4
-
     # all four adjacent moves (up, down, left, right)
     adjacent_moves = [(0, -1), (0, 1), (-1, 0), (1, 0)]
 
     while open_list:
-
-        outer_iterations += 1
-
         current_node = open_list[0]
         current_index = 0
 
@@ -74,17 +65,11 @@ def a_star(graph, start_position, goal_position):
                 current_node = open_node
                 current_index = index
 
-        # end pathfinding and return unfinished path
-        # if outer_iterations > max_iterations:
-        #     print('pathfinding ended, too many iterations')
-        #     return reconstruct_path(current_node)
-
         open_list.pop(current_index)
         closed_list.append(current_node)
 
         # return path if solution found
         if current_node == end_node:
-            print(outer_iterations)
             return reconstruct_path(current_node)
 
         children = []
@@ -108,6 +93,7 @@ def a_star(graph, start_position, goal_position):
             new_node = Node(current_node, new_position)
             children.append(new_node)
 
+        # check if child_node is in closed_list
         for child_node in children:
             is_closed = False
             for closed_node in closed_list:
@@ -125,23 +111,10 @@ def a_star(graph, start_position, goal_position):
             for open_node in open_list:
                 # >= makes straighter lines, > makes squggly lines
                 if child_node == open_node and child_node.g >= open_node.g:
-                    # already exists in open list
                     in_open_list = True
                     break
             
             if in_open_list:
                 continue
 
-            open_list.append(child_node) 
-
-if __name__ == "__main__":
-    graph = {
-        'occupied_spaces': [],
-        'width': 7,
-        'height': 7
-    }
-    start_position = [0,0]
-    goal_position = [6,6]
-
-    path = a_star(graph, start_position, goal_position)
-    print('\n', 'path: ', path)
+            open_list.append(child_node)
