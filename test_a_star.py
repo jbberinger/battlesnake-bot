@@ -3,7 +3,7 @@ import numpy as np
 
 def test_a_star__straight__no_obstacles():
     graph = {
-        'occupied_spaces': [],
+        'occupied_positions': [],
         'width': 5,
         'height': 5
     }
@@ -17,7 +17,7 @@ def test_a_star__straight__no_obstacles():
 
 def test_a_star__one_obstacle():
     graph = {
-        'occupied_spaces': [[2,0]],
+        'occupied_positions': [[2,0]],
         'width': 5,
         'height': 5
     }
@@ -31,7 +31,7 @@ def test_a_star__one_obstacle():
 
 def test_a_star__two_obstacles():
     graph = {
-        'occupied_spaces': [[2,0], [2,1]],
+        'occupied_positions': [[2,0], [2,1]],
         'width': 5,
         'height': 5
     }
@@ -45,7 +45,7 @@ def test_a_star__two_obstacles():
 
 def test_a_star__three_obstacles():
     graph = {
-        'occupied_spaces': [[2,0], [2,1], [2,2]],
+        'occupied_positions': [[2,0], [2,1], [2,2]],
         'width': 5,
         'height': 5
     }
@@ -59,7 +59,7 @@ def test_a_star__three_obstacles():
 
 def test_a_star__hook():
     graph = {
-        'occupied_spaces': [[1,0],[1,1],[1,2],[1,3],[2,3],[3,3],[3,2],[3,1]],
+        'occupied_positions': [[1,0],[1,1],[1,2],[1,3],[2,3],[3,3],[3,2],[3,1]],
         'width': 5,
         'height': 5
     }
@@ -73,7 +73,7 @@ def test_a_star__hook():
 
 def test_a_star__15x15__no_obstacles():
     graph = {
-        'occupied_spaces': [],
+        'occupied_positions': [],
         'width': 15,
         'height': 15
     }
@@ -87,7 +87,7 @@ def test_a_star__15x15__no_obstacles():
 
 def test_a_star__20x20__no_obstacles():
     graph = {
-        'occupied_spaces': [],
+        'occupied_positions': [],
         'width': 20,
         'height': 20
     }
@@ -101,7 +101,7 @@ def test_a_star__20x20__no_obstacles():
 
 def test_a_star__20x20__long_wall():
     graph = {
-        'occupied_spaces': [[6,y] for y in range(1,20)],
+        'occupied_positions': [[6,y] for y in range(1,20)],
         'width': 20,
         'height': 20
     }

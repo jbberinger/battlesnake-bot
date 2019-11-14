@@ -2,6 +2,7 @@ import json
 import random
 import numpy as np
 from enum import Enum
+from a_star import a_star
 
 
 class Direction(Enum):
@@ -12,7 +13,7 @@ class Direction(Enum):
     NONE = None
 
 
-def position_vector(position):
+def get_position_vector(position):
     return np.array([position['x'], position['y']])
 
 
@@ -24,24 +25,18 @@ def distance_scalar(vector1, vector2):
     return np.linalg.norm(vector1 - vector2)
 
 
-def get_snake_direction(body):
-    if len(body) == 1:
-        return Direction.NONE
+def get_move_direction(head_position, move_position):
+    direction_vector = np.subtract(move_position, head_position)
+    if np.array_equal(direction_vector, [0, 1]):
+        return Direction.DOWN.value
+    elif np.array_equal(direction_vector, [0, -1]):
+        return Direction.UP.value
+    elif np.array_equal(direction_vector, [1, 0]):
+        return Direction.RIGHT.value
+    elif np.array_equal(direction_vector, [-1, 0]):
+        return Direction.LEFT.value
     else:
-        head = position_vector(body[0])
-        neck = position_vector(body[1])
-        direction_vector = head - neck
-        norm = normalize_vector(direction_vector)
-        if np.array_equal(norm, [0, 1]):
-            return Direction.DOWN
-        elif np.array_equal(norm, [0, -1]):
-            return Direction.UP
-        elif np.array_equal(norm, [1, 0]):
-            return Direction.RIGHT
-        elif np.array_equal(norm, [-1, 0]):
-            return Direction.LEFT
-        else:
-            return Direction.NONE
+        return Direction.NONE.value
 
 
 def is_unoccupied(position, occupied_positions):
@@ -50,12 +45,16 @@ def is_unoccupied(position, occupied_positions):
             return False
     return True
 
+def get_occupied_positions(snakes):
+    occupied_positions = [get_position_vector(snake_position) for snake in snakes for snake_position in snake['body'] ]
+    # my_tail_index = len(snakes[0]) - 1
+    # remove my tail from occupied positions
+    # print('\n my_tail_index', my_tail_index)
+    # del occupied_positions[my_tail_index]
+    return occupied_positions
 
 def get_possible_moves(width, height, position, snakes):
-    occupied_positions = []
-    for snake in snakes:
-        for snake_position in snake['body']:
-            occupied_positions.append(position_vector(snake_position))
+    occupied_positions = get_occupied_positions(snakes)
 
     up = np.add(position, [0, -1])
     down = np.add(position, [0, 1])
@@ -65,51 +64,86 @@ def get_possible_moves(width, height, position, snakes):
     possible_moves = []
 
     if is_unoccupied(up, occupied_positions) and up[1] > -1:
-        possible_moves.append(Direction.UP)
+        possible_moves.append(Direction.UP.value)
     if is_unoccupied(down, occupied_positions) and down[1] < height:
-        possible_moves.append(Direction.DOWN)
+        possible_moves.append(Direction.DOWN.value)
     if is_unoccupied(left, occupied_positions) and left[0] > -1:
-        possible_moves.append(Direction.LEFT)
+        possible_moves.append(Direction.LEFT.value)
     if is_unoccupied(right, occupied_positions) and right[0] < width:
-        possible_moves.append(Direction.RIGHT)
+        possible_moves.append(Direction.RIGHT.value)
 
     return possible_moves
 
 
 def get_food_positions(food_list):
-    food_positions = []
-    for food in food_list:
-        food_positions.append(position_vector(food))
+    food_positions = [get_position_vector(food) for food in food_list]
     return food_positions
 
 
-def get_closest_food_position(position, food_positions):
-    return min(food_positions, key=lambda x: distance_scalar(x, position))
+def get_closest_food_positions(position, food_positions):
+    return sorted(food_positions, key=lambda x: distance_scalar(x, position))
+
+
+def chase_tail(graph, body):
+    head = get_position_vector(body[0])
+    tail = get_position_vector(body[-1])
+    # removes tail so it isn't considered an obstacle
+    path_to_tail = a_star(graph, head, tail)
+    print(path_to_tail)
+    return get_move_direction(head, path_to_tail[0])
+
+
+def go_to_closest_food(graph, body, food):
+    head = get_position_vector(body[0])
+    food_positions = get_food_positions(food)
+    closest_food_positions = get_closest_food_positions(head, food_positions)
+
+    for close_food_position in closest_food_positions:
+        moves_to_food = a_star(graph, head, close_food_position)
+        if moves_to_food:
+            return get_move_direction(head, moves_to_food[0])
+    
+    # no paths to food
+    return None
 
 
 def determine_move(data):
-    # turn = data['turn']
+    turn = data['turn']
     board = data['board']
     my_snake = data['you']
+    my_body = my_snake['body']
+    my_head = get_position_vector(my_body[0])
 
     height = board['height']
     width = board['width']
-    # food = board['food']
+    food = board['food']
     snakes = board['snakes']
 
-    # my_health = my_snake['health']
-    my_body = my_snake['body']
+    my_health = my_snake['health']
 
-    my_head = position_vector(my_body[0])
-    # my_snake_direction = get_snake_direction(my_body)
+    occupied_positions = get_occupied_positions(snakes)
+    graph = {
+        'occupied_positions': occupied_positions,
+        'width': width,
+        'height': height
+    }
 
+    # if len(my_body) > 6 and my_health > 50:
+    #     move = chase_tail(graph, my_body)
+    #     if move:
+    #         return move
+
+    move = go_to_closest_food(graph, my_body, food)
+    if move:
+        return move
+
+    # last resort
     possible_moves = get_possible_moves(width, height, my_head, snakes)
-    # food_positions = get_food_positions(food)
-    # closest_food_position = get_closest_food_position(my_head, food_positions)
-    move = random.choice(possible_moves).value
+    if possible_moves:
+        return random.choice(possible_moves)
 
-    return move
-
+    # no moves left
+    return Direction.UP.value
 
 def controller(req):
     # gather data from Battlensake request

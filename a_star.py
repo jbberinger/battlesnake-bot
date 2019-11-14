@@ -41,7 +41,7 @@ def heuristic_cost(position1, position2):
     return abs(position1[0] - position2[0]) + abs(position1[1] - position2[1])
 
 def a_star(graph, start_position, goal_position):
-    occupied_spaces = graph['occupied_spaces']
+    occupied_positions = graph['occupied_positions']
     width = graph['width']
     height = graph['height']
 
@@ -83,7 +83,7 @@ def a_star(graph, start_position, goal_position):
 
             # check if position is occupied
             is_occupied = False
-            for occupied_position in occupied_spaces:
+            for occupied_position in occupied_positions:
                 if np.array_equal(new_position, occupied_position):
                     is_occupied = True
                     break
@@ -92,14 +92,15 @@ def a_star(graph, start_position, goal_position):
 
             new_node = Node(current_node, new_position)
             children.append(new_node)
-
-        # check if child_node is in closed_list
+            
+        # check if child_node is in closed_list 
         for child_node in children:
+            
             is_closed = False
             for closed_node in closed_list:
                 if child_node == closed_node:
                     is_closed = True
-                    continue
+                    break
             if is_closed:
                 continue
 

@@ -1,4 +1,4 @@
-from controller import Direction, get_snake_direction, get_possible_moves, position_vector, get_food_positions
+from controller import Direction, get_move_direction, get_possible_moves, get_position_vector, get_food_positions
 import numpy as np
 
 
@@ -7,66 +7,34 @@ def test_get_position_vector():
         'x': 2,
         'y': 7
     }
-    position = position_vector(position_dict)
+    position = get_position_vector(position_dict)
     expected_position = np.array([2, 7])
     assert np.array_equal(position, expected_position)
 
 
-def test_direction_NONE():
-    snake_body = [
-        {
-            'x': 2,
-            'y': 2
-        },
-    ]
-    snake_direction = get_snake_direction(snake_body)
-    assert snake_direction == Direction.NONE
-
-
 def test_direction_UP():
-    snake_body = [
-        {
-            'x': 2,
-            'y': 1
-        },
-        {
-            'x': 2,
-            'y': 2
-        }
-    ]
-    snake_direction = get_snake_direction(snake_body)
-    assert snake_direction == Direction.UP
+    head = [2,3]
+    move_position = [2,2]
+    move_direction = get_move_direction(head, move_position)
+    assert move_direction == Direction.UP.value
 
+def test_direction_DOWN():
+    head = [2,3]
+    move_position = [2,4]
+    move_direction = get_move_direction(head, move_position)
+    assert move_direction == Direction.DOWN.value
 
 def test_direction_LEFT():
-    snake_body = [
-        {
-            'x': 3,
-            'y': 2
-        },
-        {
-            'x': 4,
-            'y': 2
-        }
-    ]
-    snake_direction = get_snake_direction(snake_body)
-    assert snake_direction == Direction.LEFT
-
+    head = [1,3]
+    move_position = [0,3]
+    move_direction = get_move_direction(head, move_position)
+    assert move_direction == Direction.LEFT.value
 
 def test_direction_RIGHT():
-    snake_body = [
-        {
-            'x': 4,
-            'y': 2
-        },
-        {
-            'x': 3,
-            'y': 2
-        }
-    ]
-    snake_direction = get_snake_direction(snake_body)
-    assert snake_direction == Direction.RIGHT
-
+    head = [3,3]
+    move_position = [4,3]
+    move_direction = get_move_direction(head, move_position)
+    assert move_direction == Direction.RIGHT.value
 
 def test_get_possible_moves_alone():
     snakes = [
