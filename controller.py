@@ -135,14 +135,18 @@ def determine_move(data):
 
     move = go_to_closest_food(graph, my_body, food)
     if move:
+        print('food move: ', move)
         return move
 
     # last resort
     possible_moves = get_possible_moves(width, height, my_head, snakes)
     if possible_moves:
-        return random.choice(possible_moves)
+        random_move = random.choice(possible_moves)
+        print('random_move: ', move)
+        return random_move
 
     # no moves left
+    print('all is lost')
     return Direction.UP.value
 
 def controller(req):
