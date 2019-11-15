@@ -134,33 +134,32 @@ def determine_move(data):
         'height': height
     }
 
-    try:
-
-        # chase tail
-        if len(my_body) > 5 and my_health > 30:
-            move = chase_tail(graph, my_body)
-            if move:
-                return move
-
+    # chase tail
+    if len(my_body) > 5 and my_health > 30:
+        move = chase_tail(graph, my_body)
+        if move:
+            return move
+    else:
         # go to closest food
         move = go_to_closest_food(graph, my_body, food)
         if move:
             print('food move: ', move)
             return move
+        else:
+            move = chase_tail(graph, my_body)
+            if move:
+                return move
 
-        # last resort
-        possible_moves = get_possible_moves(width, height, my_head, snakes)
-        if possible_moves:
-            random_move = random.choice(possible_moves)
-            print('random_move: ', move)
-            return random_move
+    # last resort
+    possible_moves = get_possible_moves(width, height, my_head, snakes)
+    if possible_moves:
+        random_move = random.choice(possible_moves)
+        print('random_move: ', move)
+        return random_move
 
-        # no moves left
-        print('all is lost')
-        return Direction.UP.value
-
-    except Exception as e: 
-        print(e)
+    # no moves left
+    print('all is lost')
+    return Direction.UP.value
 
 
 '''
