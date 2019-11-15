@@ -2,7 +2,7 @@ import json
 import random
 import numpy as np
 from enum import Enum
-from a_star import a_star
+from .a_star import a_star
 
 
 class Direction(Enum):
@@ -12,6 +12,10 @@ class Direction(Enum):
     RIGHT = 'right'
     NONE = None
 
+
+'''
+helper functions
+'''
 
 def get_position_vector(position):
     return np.array([position['x'], position['y']])
@@ -38,7 +42,6 @@ def get_move_direction(head_position, move_position):
     else:
         return Direction.NONE.value
 
-
 def is_unoccupied(position, occupied_positions):
     for occupied_position in occupied_positions:
         if np.array_equal(occupied_position, position):
@@ -46,11 +49,8 @@ def is_unoccupied(position, occupied_positions):
     return True
 
 def get_occupied_positions(snakes):
-    occupied_positions = [get_position_vector(snake_position) for snake in snakes for snake_position in snake['body'] ]
-    # my_tail_index = len(snakes[0]) - 1
-    # remove my tail from occupied positions
-    # print('\n my_tail_index', my_tail_index)
-    # del occupied_positions[my_tail_index]
+    # tail does not count as an occupied space
+    occupied_positions = [get_position_vector(snake_position) for snake in snakes for snake_position in snake['body'][:-1] ]
     return occupied_positions
 
 def get_possible_moves(width, height, position, snakes):
@@ -83,13 +83,19 @@ def get_food_positions(food_list):
 def get_closest_food_positions(position, food_positions):
     return sorted(food_positions, key=lambda x: distance_scalar(x, position))
 
+'''
+path finding functions
+'''
 
 def chase_tail(graph, body):
     head = get_position_vector(body[0])
     tail = get_position_vector(body[-1])
-    # removes tail so it isn't considered an obstacle
+
     path_to_tail = a_star(graph, head, tail)
     print(path_to_tail)
+
+    if not path_to_tail:
+        return None
     return get_move_direction(head, path_to_tail[0])
 
 
@@ -128,26 +134,38 @@ def determine_move(data):
         'height': height
     }
 
-    # if len(my_body) > 6 and my_health > 50:
-    #     move = chase_tail(graph, my_body)
-    #     if move:
-    #         return move
+    try:
 
-    move = go_to_closest_food(graph, my_body, food)
-    if move:
-        print('food move: ', move)
-        return move
+        # chase tail
+        if len(my_body) > 5 and my_health > 30:
+            move = chase_tail(graph, my_body)
+            if move:
+                return move
 
-    # last resort
-    possible_moves = get_possible_moves(width, height, my_head, snakes)
-    if possible_moves:
-        random_move = random.choice(possible_moves)
-        print('random_move: ', move)
-        return random_move
+        # go to closest food
+        move = go_to_closest_food(graph, my_body, food)
+        if move:
+            print('food move: ', move)
+            return move
 
-    # no moves left
-    print('all is lost')
-    return Direction.UP.value
+        # last resort
+        possible_moves = get_possible_moves(width, height, my_head, snakes)
+        if possible_moves:
+            random_move = random.choice(possible_moves)
+            print('random_move: ', move)
+            return random_move
+
+        # no moves left
+        print('all is lost')
+        return Direction.UP.value
+
+    except Exception as e: 
+        print(e)
+
+
+'''
+main function
+'''
 
 def controller(req):
     # gather data from Battlensake request

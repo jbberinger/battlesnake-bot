@@ -1,19 +1,17 @@
 import bottle
 import json
-from controller import controller
+from src.controller import controller
 import os
 
 
 @bottle.post('/start')
 def start():
     # print(json.dumps(bottle.request.json, indent=2))
-
     snake_config = {
         'color': '#43E5DF',
         'headType': 'tongue',
         'tailType': 'pixel'
     }
-
     return snake_config
 
 
