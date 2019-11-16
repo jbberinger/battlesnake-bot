@@ -1,4 +1,4 @@
-from controller import Direction, get_move_direction, get_possible_moves, get_position_vector, get_food_positions
+from src.controller import Direction, get_move_direction, get_possible_moves, get_position_vector, get_food_positions
 import numpy as np
 
 
@@ -63,10 +63,10 @@ def test_get_possible_moves_alone():
         }
     ]
 
-    my_head = [11, 12]
+    my_head = [11, 10]
 
     possible_moves = get_possible_moves(15, 15, my_head, snakes)
-    expected_possible_moves = [Direction.DOWN, Direction.LEFT, Direction.RIGHT]
+    expected_possible_moves = [Direction.UP.value, Direction.LEFT.value, Direction.RIGHT.value]
 
     assert np.array_equal(expected_possible_moves, possible_moves)
 

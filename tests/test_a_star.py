@@ -1,5 +1,6 @@
-from a_star import a_star
+from src.a_star import a_star
 import numpy as np
+
 
 def test_a_star__straight__no_obstacles():
     graph = {
