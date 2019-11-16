@@ -67,60 +67,65 @@ def a_star(graph, start_position, goal_position):
     open_set.add(start_node)
     heapq.heappush(open_heap, start_node)
 
-    while open_set:
-        current_node = heapq.heappop(open_heap)
+    try:
+        while open_set:
+            current_node = heapq.heappop(open_heap)
 
-        # return path if solution found
-        if current_node == end_node:
-            return reconstruct_path(current_node)
+            # return path if solution found
+            if current_node == end_node:
+                return reconstruct_path(current_node)
 
-        # open_set.remove(current_node)
-        closed_set.add(current_node)
-        children = set()
-        # generate child nodes
-        for move in adjacent_moves:
-            new_position = numpy.add(current_node.position, move)
+            # open_set.remove(current_node)
+            closed_set.add(current_node)
+            children = set()
+            # generate child nodes
+            for move in adjacent_moves:
+                new_position = numpy.add(current_node.position, move)
 
-            # check border boundaries
-            if new_position[0] not in range(0, width) or new_position[1] not in range(0, height):
-                continue
+                # check border boundaries
+                if new_position[0] not in range(0, width) or new_position[1] not in range(0, height):
+                    continue
 
-            # check if position is occupied
-            is_occupied = False
-            for occupied_position in occupied_positions:
-                if numpy.array_equal(new_position, occupied_position):
-                    is_occupied = True
-                    break
-            if is_occupied:
-                continue
+                # check if position is occupied
+                is_occupied = False
+                for occupied_position in occupied_positions:
+                    if numpy.array_equal(new_position, occupied_position):
+                        is_occupied = True
+                        break
+                if is_occupied:
+                    continue
 
-            new_node = Node(current_node, new_position)
-            children.add(new_node)
-            
-        # check if child_node is in closed_list 
-        for child_node in children:
-            
-            is_closed = False
-            for closed_node in closed_set:
-                if child_node == closed_node:
-                    is_closed = True
-                    break
-            if is_closed:
-                continue
+                new_node = Node(current_node, new_position)
+                children.add(new_node)
+                
+            # check if child_node is in closed_list 
+            for child_node in children:
+                
+                is_closed = False
+                for closed_node in closed_set:
+                    if child_node == closed_node:
+                        is_closed = True
+                        break
+                if is_closed:
+                    continue
 
-            child_node.g = current_node.g + 1
-            child_node.h = heuristic_cost(child_node.position, end_node.position)
-            child_node.f = child_node.g + child_node.h
+                child_node.g = current_node.g + 1
+                child_node.h = heuristic_cost(child_node.position, end_node.position)
+                child_node.f = child_node.g + child_node.h
 
-            in_open_set = False
-            for open_node in open_set:
-                # >= makes straighter lines, > makes squggly lines
-                if child_node == open_node and child_node.g >= open_node.g:
-                    in_open_set = True
-                    break
-            
-            if in_open_set:
-                continue
-            
-            open_set.add(child_node)
-            heapq.heappush(open_heap, child_node)
+                in_open_set = False
+                for open_node in open_set:
+                    # >= makes straighter lines, > makes squggly lines
+                    if child_node == open_node and child_node.g >= open_node.g:
+                        in_open_set = True
+                        break
+                
+                if in_open_set:
+                    continue
+                
+                open_set.add(child_node)
+                heapq.heappush(open_heap, child_node)
+    except:
+        pass
+
+    return None
