@@ -14,7 +14,7 @@ def test_a_star__straight__no_obstacles():
     path_length = len(a_star(graph, start_position, goal_position))
     expected_path_length = 4
 
-    assert np.array_equal(path_length, expected_path_length)
+    assert path_length == expected_path_length
 
 def test_a_star__one_obstacle():
     graph = {
@@ -28,7 +28,7 @@ def test_a_star__one_obstacle():
     path_length = len(a_star(graph, start_position, goal_position))
     expected_path_length = 5
 
-    assert np.array_equal(path_length, expected_path_length)
+    assert path_length == expected_path_length
 
 def test_a_star__two_obstacles():
     graph = {
@@ -42,7 +42,7 @@ def test_a_star__two_obstacles():
     path_length = len(a_star(graph, start_position, goal_position))
     expected_path_length = 7
 
-    assert np.array_equal(path_length, expected_path_length)
+    assert path_length == expected_path_length
 
 def test_a_star__three_obstacles():
     graph = {
@@ -56,7 +56,7 @@ def test_a_star__three_obstacles():
     path_length = len(a_star(graph, start_position, goal_position))
     expected_path_length = 9
 
-    assert np.array_equal(path_length, expected_path_length)
+    assert path_length == expected_path_length
 
 def test_a_star__hook():
     graph = {
@@ -70,7 +70,7 @@ def test_a_star__hook():
     path_length = len(a_star(graph, start_position, goal_position))
     expected_path_length = 16
 
-    assert np.array_equal(path_length, expected_path_length)
+    assert path_length == expected_path_length
 
 def test_a_star__15x15__no_obstacles():
     graph = {
@@ -84,7 +84,7 @@ def test_a_star__15x15__no_obstacles():
     path_length = len(a_star(graph, start_position, goal_position))
     expected_path_length = 28
 
-    assert np.array_equal(path_length, expected_path_length)
+    assert path_length == expected_path_length
 
 def test_a_star__20x20__no_obstacles():
     graph = {
@@ -92,13 +92,13 @@ def test_a_star__20x20__no_obstacles():
         'width': 20,
         'height': 20
     }
-    start_position = [0,19]
-    goal_position = [19,0]
+    start_position = [0,0]
+    goal_position = [19,19]
 
     path_length = len(a_star(graph, start_position, goal_position))
     expected_path_length = 38
 
-    assert np.array_equal(path_length, expected_path_length)
+    assert path_length == expected_path_length
 
 def test_a_star__20x20__long_wall():
     graph = {
@@ -112,4 +112,22 @@ def test_a_star__20x20__long_wall():
     path_length = len(a_star(graph, start_position, goal_position))
     expected_path_length = 57
 
-    assert np.array_equal(path_length, expected_path_length)
+    assert path_length == expected_path_length
+
+'''
+edge cases
+'''
+
+def test_head_against_top_wall():
+    graph = {
+        'occupied_positions': [[4,0],[4,1],[4,2],[3,2],[2,2],[2,3],[2,4],[2,5]],
+        'width': 10,
+        'height': 10
+    }
+    start_position = [4,0]
+    goal_position = [6, 2]
+
+    path_length = len(a_star(graph, start_position, goal_position))
+    expected_path_length = 4
+
+    assert path_length == expected_path_length
