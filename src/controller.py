@@ -134,7 +134,7 @@ def determine_move(data):
     }
 
     # chase tail
-    if len(my_body) > 4 and 50 < my_health < 100:
+    if len(my_body) > 7 and 50 < my_health < 100:
         move = chase_tail(graph, my_body)
         if move:
             return move
